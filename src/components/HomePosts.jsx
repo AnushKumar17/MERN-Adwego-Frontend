@@ -1,26 +1,22 @@
-import React from 'react';
 
-const HomePosts = () => {
+const HomePosts = ({ post }) => {
   return (
-    <div className="flex justify-center w-full md:w-1/2 px-4 mb-8">
-      <div className="flex flex-col rounded-lg bg-white border border-black shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] md:flex-row transition duration-300 ease-in-out transform hover:scale-105">
-        <img
-          className="h-60 md:h-auto md:w-48 md:rounded-l-lg object-cover rounded-t-lg"
-          src="https://tecdn.b-cdn.net/wp-content/uploads/2020/06/vertical.jpg"
-          alt=""
-        />
-        <div className="flex flex-col justify-start p-4">
-          <h5 className="mb-2 text-xl font-medium text-black">
-            Card title
-          </h5>
-          <p className="mb-4 text-base text-gray-800">
-            This is a wider card with supporting text below as a natural lead-in
-            to additional content. This content is a little bit longer.
-          </p>
-          <p className="text-xs text-gray-700">
-            - Author
-          </p>
+    <div className="w-full flex flex-col md:flex-row mt-8 px-8 space-y-4 md:space-y-0 md:space-x-8">
+      {/* left */}
+      <div className="w-full md:w-[35%] h-[200px] flex justify-center items-center rounded-lg bg-white  shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] md:flex-row transition duration-300 ease-in-out transform hover:scale-105">
+        <img src={post.photo} alt="" className="h-full w-full object-cover rounded-lg" />
+      </div>
+      {/* right */}
+      <div className="flex flex-col w-full md:w-[65%]">
+        <h1 className="text-xl font-bold mb-1 md:mb-2 md:text-2xl">
+          {post.title}
+        </h1>
+        <div className="flex mb-2 text-sm font-semibold text-gray-500 items-center justify-between md:mb-4">
+          <p>- {post.username}</p>
         </div>
+        <p className="text-sm md:text-lg">
+          {post.desc.slice(0, 200)}<span className='text-gray-400 text-xs'> ...Read more</span>
+        </p>
       </div>
     </div>
   );

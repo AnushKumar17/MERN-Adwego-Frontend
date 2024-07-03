@@ -1,11 +1,40 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext,useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { MdDelete } from "react-icons/md";
 import Footer from '../components/Footer';
+import { UserContext } from '../context/UserContext';
+import axios from 'axios';
+import { URL } from '../url';
 
 function EditAd() {
+
+    window.scrollTo(0, 0);
+
+    const navigate = useNavigate()
+
+    const [title, setTitle] = useState('');
+    const [desc, setDesc] = useState('');
+    const [imag, setImag] = useState('');
+    const { user } = useContext(UserContext);
+
     const [cat, setCat] = useState("")
     const [cats, setCats] = useState([])
+
+    const addID = useParams().id;
+
+    const fetchPost = async () => {
+        try {
+        const res = await axios.get(`${URL}/api/adds/${addID}`)
+          setTitle(res.data.title)
+          setDesc(res.data.desc)
+          setImag(res.data.photo)
+          setCats(res.data.categories)
+    
+        }
+        catch (err) {
+          console.log(err)
+        }
+      }
 
     const addCategory = () => {
         let updatedCats = [...cats]
@@ -20,6 +49,53 @@ function EditAd() {
         setCats(updatedCats);
     }
 
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState('');
+
+    const handleUpdate = async(e) => {
+        try {
+            e.preventDefault();
+        setLoading(true);
+        setMessage('');
+
+        const advertisement = {
+            title,
+            desc,
+            photo: imag,
+            username: user.username,
+            userId: user._id,
+            categories: cats
+        };
+
+        try {
+            const res = await axios.put(`${URL}/api/adds/${addID}`, advertisement, { withCredentials: true });
+            if (res.status === 200) {
+                navigate("/adds/"+res.data._id)
+                // Clear input fields
+                setTitle('');
+                setDesc('');
+                setImag('');
+                setCats([]);
+                navigate('/');
+            } else {
+                setMessage('Unexpected response from the server.');
+            }
+        } catch (error) {
+            setMessage('Error creating advertisement. Please try again.');
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+        } 
+        catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        fetchPost()
+        window.scrollTo(0, 0);
+    }, [addID])
 
     return (
         <div>
@@ -38,6 +114,8 @@ function EditAd() {
                     <div className="flex-1">
                         <label className="block text-gray-700 text-lg font-bold mb-2">Title</label>
                         <input
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
                             className="text-gray-700 border border-gray-300 rounded py-1 text-sm px-4 block w-full focus:outline-2 focus:outline-teal-700"
                             type="text"
                             required
@@ -47,6 +125,8 @@ function EditAd() {
                     <div className="flex-1">
                         <label className="block text-gray-700 text-lg font-bold mb-2">Image Link</label>
                         <input
+                            value={imag}
+                            onChange={(e) => setImag(e.target.value)}
                             className="text-gray-700 border border-gray-300 rounded py-1 text-sm px-4 block w-full focus:outline-2 focus:outline-teal-700"
                             type="text"
                             required
@@ -57,7 +137,9 @@ function EditAd() {
                 {/* Description */}
                 <div className="mt-2">
                     <label className="block text-gray-700 text-lg font-bold mb-2">Description</label>
-                    <textarea
+                    <textarea 
+                        value={desc}
+                        onChange={(e) => setDesc(e.target.value)}
                         className="text-gray-700 border border-gray-300 rounded py-1 text-sm px-4 block w-full h-32 focus:outline-2 focus:outline-teal-700"
                         required
                     ></textarea>
@@ -91,7 +173,9 @@ function EditAd() {
                     </div>
 
                     <div className="flex flex-col md:flex-row items-center md:ml-auto mt-2 md:mt-0">
-                        <button className="bg-teal-700 text-white text-xl font-bold py-2 px-24 rounded hover:bg-teal-600 md:ml-auto hover:scale-110 transform transition-transform duration-300">
+                        <button 
+                            onClick={handleUpdate}
+                            className="bg-teal-700 text-white text-xl font-bold py-2 px-24 rounded hover:bg-teal-600 md:ml-auto hover:scale-110 transform transition-transform duration-300">
                             Update Ad
                         </button>
                     </div>

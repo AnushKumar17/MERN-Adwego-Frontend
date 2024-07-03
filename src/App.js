@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
+import { UserContextProvider } from './context/UserContext'
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -10,7 +11,7 @@ import Profile from './pages/Profile';
 
 function App() {
   return (
-    <div className="App">
+    <UserContextProvider>
       <Routes>
         <Route exact path='/' element={<Home/>}/>
         <Route exact path='/login' element={<Login/>}/>
@@ -20,7 +21,7 @@ function App() {
         <Route exact path='/edit/:id' element={<EditAd/>}/>
         <Route exact path='/profile/:id' element={<Profile/>}/>
       </Routes>
-    </div>
+    </UserContextProvider>
   );
 }
 

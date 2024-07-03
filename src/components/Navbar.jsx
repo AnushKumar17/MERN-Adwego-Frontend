@@ -1,9 +1,29 @@
-import React from 'react'
-import { Link } from "react-router-dom"
+import React, { useContext , useState} from 'react'
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { IoSearch } from "react-icons/io5";
+import { UserContext } from '../context/UserContext';
+import { URL } from '../url';
+import axios from 'axios';
 
 function Navbar() {
-    const user = !true;
+    const {user} = useContext(UserContext);
+    const {setUser} = useContext(UserContext);
+
+    const path = useLocation().pathname
+
+    const navigate = useNavigate()
+
+    const [prompt, setPrompt] = useState("")
+
+    const handleLogout = async() => {
+        try {
+            const res =  await axios.get(`${URL}/api/auth/logout`,{withCredentials: true})
+            setUser(null)
+            navigate("/login")
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     return (
         <div className="px-4 md:px-8 lg:px-32">
@@ -13,11 +33,14 @@ function Navbar() {
             </h1>
             </div>
             <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-4 my-4 md:my-8">
-                <div className="flex items-center space-x-4">
-                    <p className="cursor-pointer"><IoSearch size={24} /></p>
+                {path === "/" && <div className="flex items-center space-x-4">
+                    <p 
+                    onClick={() => navigate(prompt ? "?search=" + prompt : navigate("/"))}
+                    className="cursor-pointer"><IoSearch size={24} /></p>
                     <div className="w-full md:w-72">
                         <div className="relative w-full min-w-[200px] h-10">
                             <input
+                            onChange={(e) => setPrompt(e.target.value)} 
                             className="peer w-full h-full bg-transparent text-blue-gray-700 font-sans font-normal outline outline-0 focus:outline-0 disabled:bg-blue-gray-50 disabled:border-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border focus:border-2 border-t-transparent focus:border-t-transparent text-sm px-3 py-2.5 rounded-[7px] border-blue-gray-200 focus:border-gray-900"
                             placeholder="" />
                             <label
@@ -25,10 +48,11 @@ function Navbar() {
                             </label>
                         </div>
                     </div>
-                </div>
+                </div>}
                 <div className="flex items-center space-x-4">
                     {user ? <h3><Link to="/create">Create Post</Link></h3> : <h3><Link to="/login">Login</Link></h3>}
-                    {user ? <h3><Link to="/profile">My Profile</Link></h3> : <h3><Link to="/register">Register</Link></h3>}
+                    {user ? <h3><Link to={"/profile/"+user._id}>My Profile</Link></h3> : <h3><Link to="/register">Register</Link></h3>}
+                    {user ? <h3 onClick={handleLogout}><Link to="/">Logout</Link></h3> : <h3></h3>}
                 </div>
             </div>
         </div>
